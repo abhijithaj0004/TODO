@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todo_app/db_functions/db_functions.dart';
 import 'package:todo_app/widgets/todo_tile.dart';
 import 'package:todo_app/widgets/alert_diologue.dart';
 
@@ -11,31 +13,46 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //reference for hive box
+  final _mybox = Hive.box('mybox');
+  @override
+  void initState() {
+    final _myBox = Hive.box('mybox');
+    if (_myBox.get('TODOLIST') == null) {
+      tD.createInitialData();
+    } else {
+      //if data already exists
+      tD.loadData();
+    }
+
+    // TODO: implement initState
+    super.initState();
+  }
+
   TextEditingController _controller = TextEditingController();
-  List toDoList = [
-    ['Do Exercise', false]
-  ];
+  ToDoListModel tD = ToDoListModel();
   checkboxChanged(bool? value, int index) {
     setState(() {
-      toDoList[index][1] = !toDoList[index][1];
+      tD.toDoList[index][1] = !tD.toDoList[index][1];
     });
+    tD.updateDataBase();
   }
 
 //add new task
   saveNewTask() {
     setState(() {
-      toDoList.add([_controller.text, false]);
+      tD.toDoList.add([_controller.text, false]);
     });
     Navigator.of(context).pop();
+    tD.updateDataBase();
   }
 
 //delete task
-  deleteTask(
-    int index,
-  ) {
+  deleteTask(int index) {
     setState(() {
-      toDoList.removeAt(index);
+      tD.toDoList.removeAt(index);
     });
+    tD.updateDataBase();
   }
 
   @override
@@ -76,14 +93,14 @@ class _HomeScreenState extends State<HomeScreen> {
             style: GoogleFonts.acme(textStyle: TextStyle(fontSize: 30)),
           ),
         ),
-        body: toDoList.isEmpty
+        body: tD.toDoList.isEmpty
             ? taskIsEmpty()
             : ListView.builder(
-                itemCount: toDoList.length,
+                itemCount: tD.toDoList.length,
                 itemBuilder: (context, index) {
                   return ToDoTile(
-                    taskName: toDoList[index][0],
-                    taskCompleted: toDoList[index][1],
+                    taskName: tD.toDoList[index][0],
+                    taskCompleted: tD.toDoList[index][1],
                     onChanged: (value) {
                       checkboxChanged(value, index);
                     },

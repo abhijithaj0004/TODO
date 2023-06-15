@@ -4,8 +4,8 @@ import 'package:todo_app/home_screen.dart';
 
 void main(List<String> args) async {
   //init hive
-  Hive.initFlutter();
-  
+  await Hive.initFlutter();
+  final box = await Hive.openBox('mybox');
   runApp(MyApp());
 }
 
