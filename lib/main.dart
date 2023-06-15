@@ -5,8 +5,8 @@ import 'package:todo_app/home_screen.dart';
 void main(List<String> args) async {
   //init hive
   await Hive.initFlutter();
-  final box = await Hive.openBox('mybox');
-  runApp(MyApp());
+  await Hive.openBox('mybox');
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.yellow),
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }

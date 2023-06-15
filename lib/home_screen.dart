@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -17,8 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _mybox = Hive.box('mybox');
   @override
   void initState() {
-    final _myBox = Hive.box('mybox');
-    if (_myBox.get('TODOLIST') == null) {
+    if (_mybox.get('TODOLIST') == null) {
       tD.createInitialData();
     } else {
       //if data already exists
@@ -29,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   ToDoListModel tD = ToDoListModel();
   checkboxChanged(bool? value, int index) {
     setState(() {
