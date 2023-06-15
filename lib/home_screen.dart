@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ToDoListModel tD = ToDoListModel();
   checkboxChanged(bool? value, int index) {
     setState(() {
-      tD.toDoList[index][1] = !tD.toDoList[index][1];
+      tD.toDoList.value[index][1] = !tD.toDoList.value[index][1];
     });
     tD.updateDataBase();
   }
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 //add new task
   saveNewTask() {
     setState(() {
-      tD.toDoList.add([_controller.text, false]);
+      tD.toDoList.value.add([_controller.text, false]);
     });
     Navigator.of(context).pop();
     tD.updateDataBase();
@@ -51,25 +51,13 @@ class _HomeScreenState extends State<HomeScreen> {
 //delete task
   deleteTask(int index) {
     setState(() {
-      tD.toDoList.removeAt(index);
+      tD.toDoList.value.removeAt(index);
     });
     tD.updateDataBase();
   }
 
   @override
   Widget build(BuildContext context) {
-    // if list is empty
-    taskIsEmpty() {
-      setState(() {
-        Center(
-          child: Text(
-            'Add New Task',
-            style: TextStyle(color: Colors.black),
-          ),
-        );
-      });
-    }
-
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -94,20 +82,26 @@ class _HomeScreenState extends State<HomeScreen> {
             style: GoogleFonts.acme(textStyle: TextStyle(fontSize: 30)),
           ),
         ),
-        body: tD.toDoList.isEmpty
-            ? taskIsEmpty()
-            : ListView.builder(
-                itemCount: tD.toDoList.length,
-                itemBuilder: (context, index) {
-                  return ToDoTile(
-                    taskName: tD.toDoList[index][0],
-                    taskCompleted: tD.toDoList[index][1],
-                    onChanged: (value) {
-                      checkboxChanged(value, index);
-                    },
-                    deleteFunction: (context) => deleteTask(index),
-                  );
-                },
-              ));
+        body: ValueListenableBuilder(
+            valueListenable: tD.toDoList,
+            builder: (context, value, _) {
+              return tD.toDoList.value.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: tD.toDoList.value.length,
+                      itemBuilder: (context, index) {
+                        return ToDoTile(
+                          taskName: tD.toDoList.value[index][0],
+                          taskCompleted: tD.toDoList.value[index][1],
+                          onChanged: (value) {
+                            checkboxChanged(value, index);
+                          },
+                          deleteFunction: (context) => deleteTask(index),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text('List is Empty'),
+                    );
+            }));
   }
 }
